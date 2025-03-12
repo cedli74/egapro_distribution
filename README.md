@@ -21,7 +21,3 @@ docker-compose up --build
 - **gRPC:** `grpcurl -plaintext localhost:50051 list`
 - **Swagger:** `http://localhost/api/v1/apidocs`
 ```
-
----
-
-Avec cette structure, ton projet est bien organisé et conforme aux exigences. Tu peux directement **cloner le repo, ajouter le fichier CSV, et lancer Docker** 🚀
