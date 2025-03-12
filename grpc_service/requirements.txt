@@ -1,0 +1,4 @@
+flask
+flasgger
+grpcio
+grpcio-tools
