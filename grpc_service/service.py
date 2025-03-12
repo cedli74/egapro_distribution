@@ -3,9 +3,13 @@ from concurrent import futures
 import egapro_pb2
 import egapro_pb2_grpc
 import csv
-import sys
-sys.path.append('/app')  # Ajoute le répertoire du service gRPC au path
+import os
 
+def generate_proto():
+    import subprocess
+    subprocess.run(["python", "-m", "grpc_tools.protoc", "-I./proto", "--python_out=.", "--grpc_python_out=.", "./proto/egapro.proto"], check=True)
+
+generate_proto()
 
 class EgaProService(egapro_pb2_grpc.EgaProServiceServicer):
     def __init__(self):
@@ -13,7 +17,8 @@ class EgaProService(egapro_pb2_grpc.EgaProServiceServicer):
 
     def load_data(self):
         data = []
-        with open("../data/index-egalite-fh-utf8.csv", newline='', encoding='utf-8') as csvfile:
+        csv_path = os.path.join(os.path.dirname(__file__), "../data/index-egalite-fh-utf8.csv")
+        with open(csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 data.append(egapro_pb2.Entreprise(siren=row['siren'], name=row['name']))
