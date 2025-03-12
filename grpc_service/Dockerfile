@@ -1,11 +1,12 @@
 FROM python:3.9
- 
+
 WORKDIR /app
- 
-COPY requirements.txt requirements.txt
+
+COPY . /app
+
 RUN pip install grpcio grpcio-tools
-RUN pip install -r requirements.txt
- 
-COPY . .
- 
+
+# Compiler les fichiers proto
+RUN python -m grpc_tools.protoc -I./proto --python_out=. --grpc_python_out=. ./proto/egapro.proto
+
 CMD ["python", "service.py"]
