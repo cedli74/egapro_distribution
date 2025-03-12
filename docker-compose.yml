@@ -1,11 +1,26 @@
-version: '3.8'
+```yaml
+version: '3'
+
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb
+  rest_api:
+    build: ./rest_api
     ports:
-      - "27017:27017"
+      - "5000:5000"
     volumes:
-      - mongodb_data:/data/db
-volumes:
-  mongodb_data:
+      - ./data:/app/data
+
+  grpc_service:
+    build: ./grpc_service
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./data:/app/data
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - rest_api
+      - grpc_service
+```
