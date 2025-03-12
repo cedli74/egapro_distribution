@@ -1,0 +1,12 @@
+swagger: "2.0"
+info:
+  title: "API EgaPro"
+  description: "Documentation de l'API EgaPro"
+  version: "1.0.0"
+paths:
+  /api/v1/entreprises:
+    get:
+      summary: "Obtenir la liste des entreprises"
+      responses:
+        200:
+          description: "Succès"
