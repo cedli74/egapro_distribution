@@ -1,1 +1,16 @@
+```proto
+syntax = "proto3";
 
+service EgaProService {
+  rpc GetEntreprises (Empty) returns (EntrepriseList);
+}
+
+message Empty {}
+message Entreprise {
+  string siren = 1;
+  string name = 2;
+}
+message EntrepriseList {
+  repeated Entreprise entreprises = 1;
+}
+```
