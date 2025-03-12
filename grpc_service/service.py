@@ -1,4 +1,3 @@
-```python
 import grpc
 from concurrent import futures
 import egapro_pb2
@@ -25,6 +24,3 @@ egapro_pb2_grpc.add_EgaProServiceServicer_to_server(EgaProService(), server)
 server.add_insecure_port('[::]:50051')
 server.start()
 server.wait_for_termination()
-```
-
----
