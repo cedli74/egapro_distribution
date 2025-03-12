@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   rest_api:
     build: ./rest_api
