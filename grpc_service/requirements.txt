@@ -1,4 +1,3 @@
-flask
-flasgger
 grpcio
 grpcio-tools
+protobuf
