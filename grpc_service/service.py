@@ -3,6 +3,9 @@ from concurrent import futures
 import egapro_pb2
 import egapro_pb2_grpc
 import csv
+import sys
+sys.path.append('/app')  # Ajoute le répertoire du service gRPC au path
+
 
 class EgaProService(egapro_pb2_grpc.EgaProServiceServicer):
     def __init__(self):
