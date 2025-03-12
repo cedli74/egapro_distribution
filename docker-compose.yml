@@ -6,6 +6,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./rest_api/swagger.yml:/app/swagger.yml  # Ajout du fichier Swagger
+      - ./rest_api:/app  # Ajout pour s'assurer que les fichiers sont bien copiés
 
   grpc_service:
     build: ./grpc_service
@@ -13,6 +14,7 @@ services:
       - "50051:50051"
     volumes:
       - ./data:/app/data
+      - ./grpc_service:/app
 
   nginx:
     build: ./nginx
