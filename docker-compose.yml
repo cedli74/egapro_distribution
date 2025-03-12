@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   rest_api:
     build: ./rest_api
@@ -5,8 +7,7 @@ services:
       - "5000:5000"
     volumes:
       - ./data:/app/data
-      - ./rest_api/swagger.yml:/app/swagger.yml  # Ajout du fichier Swagger
-      - ./rest_api:/app  # Ajout pour s'assurer que les fichiers sont bien copiés
+    restart: always
 
   grpc_service:
     build: ./grpc_service
@@ -14,7 +15,13 @@ services:
       - "50051:50051"
     volumes:
       - ./data:/app/data
-      - ./grpc_service:/app
+    restart: always
+
+  swagger:
+    build: ./swagger
+    ports:
+      - "5001:5001"
+    restart: always
 
   nginx:
     build: ./nginx
@@ -23,3 +30,5 @@ services:
     depends_on:
       - rest_api
       - grpc_service
+      - swagger
+    restart: always
