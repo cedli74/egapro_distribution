@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
  
 COPY . .
  
-CMD ["python", "service.py"]
+CMD ["python", "/app/app.py"]
