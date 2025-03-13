@@ -19,7 +19,7 @@ def load_data():
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
     data = load_data()
-    entreprise = next((e for e in data if e['siren'] == siren), None)
+    entreprise = next((e for e in data if e['Tranche d\'eff. SIREN'] == siren), None)
     if entreprise:
         print(f"Found enterprise: {entreprise}")  # Log pour vérifier l'entreprise trouvée
         return jsonify(entreprise)
