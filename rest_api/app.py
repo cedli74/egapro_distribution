@@ -1,30 +1,45 @@
 from flask import Flask, jsonify
 import csv
+import os
 
 app = Flask(__name__)
 
+# Chargement unique des données CSV au démarrage
+DATA = []
+
 def load_data():
-    data = []
-    csv_path = "/app/data/index-egalite-fh-utf8.csv"
+    global DATA
+    csv_path = os.path.join(os.path.dirname(__file__), "../data/index-egalite-fh-utf8.csv")
+    
     try:
-        with open(csv_path, newline='', encoding='utf-8') as csvfile:
+        with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
-            for row in reader:
-                data.append(row)
-        print(f"Loaded {len(data)} entries from CSV.")  # Log pour vérifier le chargement des données
+            DATA = [row for row in reader]
+
+        if DATA:
+            print(f"✅ {len(DATA)} entreprises chargées depuis le fichier CSV.")
+            print(f"🔍 Colonnes disponibles : {list(DATA[0].keys())}")  # Vérifier les noms des colonnes
+
     except Exception as e:
-        print(f"Error loading data: {e}")
-    return data
+        print(f"❌ Erreur lors du chargement des données : {e}")
+
+# Charger les données une seule fois
+load_data()
+
+def clean_string(value):
+    """ Nettoie une chaîne : supprime les espaces et normalise l'encodage. """
+    return value.strip() if value else ""
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
-    data = load_data()
-    entreprise = next((e for e in data if e['SIREN'] == siren), None)
+    siren = clean_string(siren)  # Nettoyer le SIREN en entrée
+    entreprise = next((e for e in DATA if clean_string(e.get('SIREN', '')) == siren), None)
+
     if entreprise:
-        print(f"Found enterprise: {entreprise}")  # Log pour vérifier l'entreprise trouvée
+        print(f"✅ Entreprise trouvée pour SIREN {siren} : {entreprise['Raison Sociale']}")
         return jsonify(entreprise)
     else:
-        print(f"No enterprise found with SIREN: {siren}")  # Log pour vérifier si aucune entreprise n'est trouvée
+        print(f"❌ Aucune entreprise trouvée pour le SIREN : {siren}")
         return jsonify({"message": "Entreprise non trouvée"}), 404
 
 if __name__ == "__main__":
