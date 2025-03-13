@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Chargement unique des données CSV au démarrage
+# Données chargées au démarrage
 DATA = []
 
 def load_data():
@@ -18,7 +18,11 @@ def load_data():
 
         if DATA:
             print(f"✅ {len(DATA)} entreprises chargées depuis le fichier CSV.")
-            print(f"🔍 Colonnes disponibles : {list(DATA[0].keys())}")  # Vérifier les noms des colonnes
+            print(f"🔍 Colonnes disponibles : {list(DATA[0].keys())}")  # Vérifier les colonnes
+
+            # Vérifier un exemple d'entreprise pour voir comment les données sont stockées
+            example = DATA[0]
+            print(f"📌 Exemple de ligne chargée : {example}")
 
     except Exception as e:
         print(f"❌ Erreur lors du chargement des données : {e}")
@@ -28,11 +32,20 @@ load_data()
 
 def clean_string(value):
     """ Nettoie une chaîne : supprime les espaces et normalise l'encodage. """
-    return value.strip() if value else ""
+    return str(value).strip() if value else ""
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
     siren = clean_string(siren)  # Nettoyer le SIREN en entrée
+
+    # Vérifier si le SIREN est bien chargé dans les données
+    all_sirens = [clean_string(e.get('SIREN', '')) for e in DATA]
+    
+    if siren not in all_sirens:
+        print(f"❌ SIREN {siren} non trouvé dans la base !")
+        return jsonify({"message": "Entreprise non trouvée"}), 404
+
+    # Recherche de l'entreprise
     entreprise = next((e for e in DATA if clean_string(e.get('SIREN', '')) == siren), None)
 
     if entreprise:
