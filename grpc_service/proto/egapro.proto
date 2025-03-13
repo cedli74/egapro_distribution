@@ -1,16 +1,36 @@
 syntax = "proto3";
 
-service EgaProService {
-  rpc GetEntreprises (Empty) returns (EntrepriseList);
+package egapro;
+
+service EgaproService {
+  rpc GetEntreprises (EntreprisesRequest) returns (EntreprisesResponse);
+  rpc GetEntrepriseBySiren (EntrepriseRequest) returns (EntrepriseResponse);
 }
 
-message Empty {}
+message EntreprisesRequest {
+  // Ajoutez des champs si nécessaire
+}
+
+message EntreprisesResponse {
+  repeated Entreprise entreprises = 1;
+}
+
+message EntrepriseRequest {
+  string siren = 1;
+}
+
+message EntrepriseResponse {
+  string siren = 1;
+  string nom = 2;
+  int32 score_egalite = 3;
+  string adresse = 4;
+  // Ajoutez d'autres champs selon vos besoins
+}
 
 message Entreprise {
-  string siren = 1;  // Assurez-vous que ce champ est défini
-  string name = 2;
-}
-
-message EntrepriseList {
-  repeated Entreprise entreprises = 1;
+  string siren = 1;
+  string nom = 2;
+  int32 score_egalite = 3;
+  string adresse = 4;
+  // Ajoutez d'autres champs selon vos besoins
 }
