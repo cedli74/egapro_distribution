@@ -1,16 +1,8 @@
 from flask import Flask, jsonify
 import csv
-import unicodedata
 import re
 
 app = Flask(__name__)
-
-def normalize_column_name(name):
-    # Supprime les accents et les caractères spéciaux
-    name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
-    # Remplace les espaces et les caractères non alphanumériques par des underscores
-    name = re.sub(r'[^\w\s]', '', name).replace(' ', '_')
-    return name
 
 def load_data():
     data = []
@@ -28,10 +20,14 @@ def load_data():
         print(f"Error loading data: {e}")
     return data
 
+def normalize_column_name(name):
+    # Remplace les caractères spéciaux et les espaces par des underscores
+    return re.sub(r'[^\w\s]', '', name).replace(' ', '_')
+
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
     data = load_data()
-    entreprise = next((e for e in data if e['Tranche_d_eff_SIREN'] == siren), None)
+    entreprise = next((e for e in data if e['SIREN'] == siren), None)
     if entreprise:
         print(f"Found enterprise: {entreprise}")  # Log pour vérifier l'entreprise trouvée
         return jsonify(entreprise)
