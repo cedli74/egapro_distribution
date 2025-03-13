@@ -13,13 +13,13 @@ class EgaProService(egapro_pb2_grpc.EgaProServiceServicer):
         data = []
         csv_path = "/app/data/index-egalite-fh-utf8.csv"  # Chemin correct pour Docker
         with open(csv_path, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
+            reader = csv.DictReader(csvfile, delimiter=';')  # Utilisez le point-virgule comme délimiteur
             print(f"CSV Headers: {reader.fieldnames}")  # Affiche les en-têtes du CSV
             for row in reader:
-                if 'siren' in row and 'name' in row:  # Vérifiez que les clés existent
-                    data.append(egapro_pb2.Entreprise(siren=row['siren'], name=row['name']))
+                if 'SIREN' in row and 'Raison Sociale' in row:  # Utilisez les noms exacts des colonnes
+                    data.append(egapro_pb2.Entreprise(siren=row['SIREN'], name=row['Raison Sociale']))
                 else:
-                    print(f"Missing expected fields in row: {row}")
+                    print(f"Missing expected fields in row: {row}")  # Affiche uniquement les lignes problématiques
         return data
 
     def GetEntreprises(self, request, context):
