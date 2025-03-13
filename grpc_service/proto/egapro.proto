@@ -9,7 +9,7 @@ service EgaProService {
 message Empty {}
 
 message Entreprise {
-  string siren = 1;
+  string SIREN = 1;
   string name = 2;
 }
 
