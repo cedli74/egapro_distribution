@@ -4,20 +4,6 @@ from flasgger import Swagger, swag_from
 app = Flask(__name__)
 Swagger(app)
 
-@app.route("/api/v1/entreprises", methods=["GET"])
-@swag_from({
-    "tags": ["Entreprises"],
-    "description": "Retourne la liste de toutes les entreprises",
-    "responses": {
-        "200": {
-            "description": "Liste des entreprises"
-        }
-    }
-})
-def get_entreprises():
-    # Cette route est un proxy pour la documentation, pas besoin de logique ici
-    return jsonify({"message": "Liste des entreprises"})
-
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 @swag_from({
     "tags": ["Entreprises"],
@@ -37,7 +23,9 @@ def get_entreprises():
                 "application/json": {
                     "siren": "123456789",
                     "nom": "Entreprise Exemple",
-                    "score_egalite": 95
+                    "score_egalite": 95,
+                    "adresse": "123 Rue Exemple, 75000 Paris",
+                    "autres_infos": "..."
                 }
             }
         },
