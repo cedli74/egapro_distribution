@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 def load_data():
     data = []
-    csv_path = os.path.join(os.path.dirname(__file__), "../data/index-egalite-fh-utf8.csv")
+    csv_path = "/app/data/index-egalite-fh-utf8.csv"  # Chemin correct pour Docker
     with open(csv_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
