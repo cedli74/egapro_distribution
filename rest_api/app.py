@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 import csv
-import re
 
 app = Flask(__name__)
 
@@ -10,19 +9,12 @@ def load_data():
     try:
         with open(csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
-            # Normaliser les noms de colonnes
-            fieldnames = [normalize_column_name(field) for field in reader.fieldnames]
-            reader = csv.DictReader(csvfile, fieldnames=fieldnames)
             for row in reader:
                 data.append(row)
         print(f"Loaded {len(data)} entries from CSV.")  # Log pour vérifier le chargement des données
     except Exception as e:
         print(f"Error loading data: {e}")
     return data
-
-def normalize_column_name(name):
-    # Remplace les caractères spéciaux et les espaces par des underscores
-    return re.sub(r'[^\w\s]', '', name).replace(' ', '_')
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
