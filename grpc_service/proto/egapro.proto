@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package egapro;
-
 service EgaProService {
   rpc GetEntreprises (Empty) returns (EntrepriseList);
 }
@@ -9,7 +7,7 @@ service EgaProService {
 message Empty {}
 
 message Entreprise {
-  string SIREN = 1;
+  string siren = 1;  // Assurez-vous que ce champ est défini
   string name = 2;
 }
 
