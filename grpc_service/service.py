@@ -1,32 +1,31 @@
-import grpc
-from concurrent import futures
-import egapro_pb2
-import egapro_pb2_grpc
+from flask import Flask, jsonify
 import csv
-import os
 
-class EgaProService(egapro_pb2_grpc.EgaProServiceServicer):
-    def __init__(self):
-        self.data = self.load_data()
+app = Flask(__name__)
 
-    def load_data(self):
-        data = []
-        csv_path = "/app/data/index-egalite-fh-utf8.csv"  # Chemin correct pour Docker
+def load_data():
+    data = []
+    csv_path = "/app/data/index-egalite-fh-utf8.csv"
+    try:
         with open(csv_path, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile, delimiter=';')  # Utilisez le point-virgule comme délimiteur
-            print(f"CSV Headers: {reader.fieldnames}")  # Affiche les en-têtes du CSV
+            reader = csv.DictReader(csvfile)
             for row in reader:
-                if 'SIREN' in row and 'Raison Sociale' in row:  # Utilisez les noms exacts des colonnes
-                    data.append(egapro_pb2.Entreprise(siren=row['SIREN'], name=row['Raison Sociale']))
-                else:
-                    print(f"Missing expected fields in row: {row}")  # Affiche uniquement les lignes problématiques
-        return data
+                data.append(row)
+        print(f"Loaded {len(data)} entries from CSV.")  # Log pour vérifier le chargement des données
+    except Exception as e:
+        print(f"Error loading data: {e}")
+    return data
 
-    def GetEntreprises(self, request, context):
-        return egapro_pb2.EntrepriseList(entreprises=self.data)
+@app.route("/api/v1/entreprises/<siren>", methods=["GET"])
+def get_entreprise_by_siren(siren):
+    data = load_data()
+    entreprise = next((e for e in data if e['siren'] == siren), None)
+    if entreprise:
+        print(f"Found enterprise: {entreprise}")  # Log pour vérifier l'entreprise trouvée
+        return jsonify(entreprise)
+    else:
+        print(f"No enterprise found with SIREN: {siren}")  # Log pour vérifier si aucune entreprise n'est trouvée
+        return jsonify({"message": "Entreprise non trouvée"}), 404
 
-server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-egapro_pb2_grpc.add_EgaProServiceServicer_to_server(EgaProService(), server)
-server.add_insecure_port('[::]:50051')
-server.start()
-server.wait_for_termination()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
