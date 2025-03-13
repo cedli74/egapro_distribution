@@ -12,11 +12,6 @@ def load_data():
             data.append(row)
     return data
 
-@app.route("/api/v1/entreprises", methods=["GET"])
-def get_entreprises():
-    data = load_data()
-    return jsonify(data)
-
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
     data = load_data()
