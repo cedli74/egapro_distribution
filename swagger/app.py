@@ -1,18 +1,8 @@
 from flask import Flask, jsonify
 from flasgger import Swagger, swag_from
-import csv
 
 app = Flask(__name__)
 Swagger(app)
-
-def load_data():
-    data = []
-    csv_path = "/app/data/index-egalite-fh-utf8.csv"
-    with open(csv_path, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            data.append(row)
-    return data
 
 @app.route("/api/v1/entreprises", methods=["GET"])
 @swag_from({
@@ -25,8 +15,8 @@ def load_data():
     }
 })
 def get_entreprises():
-    data = load_data()
-    return jsonify(data)
+    # Cette route est un proxy pour la documentation, pas besoin de logique ici
+    return jsonify({"message": "Liste des entreprises"})
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 @swag_from({
@@ -57,12 +47,8 @@ def get_entreprises():
     }
 })
 def get_entreprise_by_siren(siren):
-    data = load_data()
-    entreprise = next((e for e in data if e['siren'] == siren), None)
-    if entreprise:
-        return jsonify(entreprise)
-    else:
-        return jsonify({"message": "Entreprise non trouvée"}), 404
+    # Cette route est un proxy pour la documentation, pas besoin de logique ici
+    return jsonify({"message": "Données de l'entreprise"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
