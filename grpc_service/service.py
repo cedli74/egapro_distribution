@@ -1,31 +1,42 @@
-from flask import Flask, jsonify
+import grpc
+from concurrent import futures
+import egapro_pb2
+import egapro_pb2_grpc
 import csv
 
-app = Flask(__name__)
+class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
+    def __init__(self):
+        self.data = self.load_data()
 
-def load_data():
-    data = []
-    csv_path = "/app/data/index-egalite-fh-utf8.csv"
-    try:
+    def load_data(self):
+        data = []
+        csv_path = "/app/data/index-egalite-fh-utf8.csv"
         with open(csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 data.append(row)
-        print(f"Loaded {len(data)} entries from CSV.")  # Log pour vérifier le chargement des données
-    except Exception as e:
-        print(f"Error loading data: {e}")
-    return data
+        return data
 
-@app.route("/api/v1/entreprises/<siren>", methods=["GET"])
-def get_entreprise_by_siren(siren):
-    data = load_data()
-    entreprise = next((e for e in data if e['siren'] == siren), None)
-    if entreprise:
-        print(f"Found enterprise: {entreprise}")  # Log pour vérifier l'entreprise trouvée
-        return jsonify(entreprise)
-    else:
-        print(f"No enterprise found with SIREN: {siren}")  # Log pour vérifier si aucune entreprise n'est trouvée
-        return jsonify({"message": "Entreprise non trouvée"}), 404
+    def GetEntreprises(self, request, context):
+        entreprises = [egapro_pb2.Entreprise(**e) for e in self.data]
+        return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    def GetEntrepriseBySiren(self, request, context):
+        siren = request.siren
+        entreprise = next((e for e in self.data if e['siren'] == siren), None)
+        if entreprise:
+            return egapro_pb2.EntrepriseResponse(**entreprise)
+        else:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details('Entreprise non trouvée')
+            return egapro_pb2.EntrepriseResponse()
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    egapro_pb2_grpc.add_EgaproServiceServicer_to_server(EgaproService(), server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    server.wait_for_termination()
+
+if __name__ == '__main__':
+    serve()
