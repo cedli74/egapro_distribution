@@ -5,19 +5,13 @@ import egapro_pb2_grpc
 import csv
 import os
 
-def generate_proto():
-    import subprocess
-    subprocess.run(["python", "-m", "grpc_tools.protoc", "-I./proto", "--python_out=.", "--grpc_python_out=.", "./proto/egapro.proto"], check=True)
-
-generate_proto()
-
 class EgaProService(egapro_pb2_grpc.EgaProServiceServicer):
     def __init__(self):
         self.data = self.load_data()
 
     def load_data(self):
         data = []
-        csv_path = os.path.join(os.path.dirname(__file__), "../data/index-egalite-fh-utf8.csv")
+        csv_path = "/app/data/index-egalite-fh-utf8.csv"  # Chemin correct pour Docker
         with open(csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
