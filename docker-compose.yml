@@ -20,7 +20,7 @@ services:
   swagger:
     build: ./swagger
     ports:
-      - "5001:5001"
+      - "5000:5000"
     restart: always
 
   nginx:
