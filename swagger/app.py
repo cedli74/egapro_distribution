@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+Tien mon code swagger from flask import Flask, jsonify
 from flasgger import Swagger, swag_from
 
 app = Flask(__name__)
@@ -35,16 +35,8 @@ Swagger(app)
     }
 })
 def get_entreprise_by_siren(siren):
-    # Logique pour récupérer les données de l'entreprise
-    # Remplacez cela par votre logique réelle
-    entreprise = {
-        "siren": siren,
-        "nom": "Entreprise Exemple",
-        "score_egalite": 95,
-        "adresse": "123 Rue Exemple, 75000 Paris",
-        "autres_infos": "..."
-    }
-    return jsonify(entreprise)
+    # Cette route est un proxy pour la documentation, pas besoin de logique ici
+    return jsonify({"message": "Données de l'entreprise"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)  # Assurez-vous que le port est 5000
+    app.run(host="0.0.0.0", port=5001)
