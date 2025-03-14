@@ -46,4 +46,4 @@ def get_entreprise_by_siren(siren):
     return jsonify(entreprise)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)  # L'application et Swagger s'exécutent sur le port 5000
+    app.run(host="0.0.0.0", port=5001)  # L'application et Swagger s'exécutent sur le port 5000
