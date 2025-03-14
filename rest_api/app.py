@@ -1,8 +1,12 @@
 from flask import Flask, jsonify
+from flask_cors import CORS  # 📌 Ajout de Flask-CORS
 import csv
 import os
 
 app = Flask(__name__)
+
+# 🔥 Activation de CORS pour autoriser Swagger (localhost:5001)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5001"}})
 
 # Données chargées au démarrage
 DATA = []
@@ -25,10 +29,6 @@ def load_data():
             for i, example in enumerate(DATA[:3]):
                 print(f"  Ligne {i+1} : {example}")
 
-            # Vérifier un exemple d'entreprise pour voir comment les données sont stockées
-            example = DATA[0]
-            print(f"📌 Exemple de ligne chargée : {example}")
-
     except Exception as e:
         print(f"❌ Erreur lors du chargement des données : {e}")
 
@@ -38,6 +38,11 @@ load_data()
 def clean_string(value):
     """ Nettoie une chaîne : supprime les espaces et normalise l'encodage. """
     return str(value).strip() if value else ""
+
+@app.route("/", methods=["GET"])
+def home():
+    """ Test rapide pour voir si l'API fonctionne """
+    return jsonify({"message": "API EgaPro fonctionne !"}), 200
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 def get_entreprise_by_siren(siren):
@@ -61,4 +66,4 @@ def get_entreprise_by_siren(siren):
         return jsonify({"message": "Entreprise non trouvée"}), 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)  # 🔥 Ajout de debug=True pour voir les erreurs
