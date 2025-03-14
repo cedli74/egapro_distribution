@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flasgger import Swagger, swag_from
 
 app = Flask(__name__)
-Swagger(app, template_file='swagger_template.yml')  # Utilisez le fichier de modèle
+Swagger(app, template_file='swagger.yml')  # Utilisez le fichier de modèle
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 @swag_from({
