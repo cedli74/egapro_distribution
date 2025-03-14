@@ -9,8 +9,8 @@ DATA = []
 
 def load_data():
     global DATA
-    csv_path = os.path.join(os.path.dirname(__file__), "/app/data/index-egalite-fh-utf8.csv")
-    
+    csv_path = os.path.join(os.path.dirname(__file__), "data/index-egalite-fh-utf8.csv")
+
     try:
         with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
@@ -19,6 +19,11 @@ def load_data():
         if DATA:
             print(f"✅ {len(DATA)} entreprises chargées depuis le fichier CSV.")
             print(f"🔍 Colonnes disponibles : {list(DATA[0].keys())}")  # Vérifier les colonnes
+
+            # Afficher les trois premières lignes du fichier CSV
+            print("📄 Extrait des premières lignes du CSV :")
+            for i, example in enumerate(DATA[:3]):
+                print(f"  Ligne {i+1} : {example}")
 
             # Vérifier un exemple d'entreprise pour voir comment les données sont stockées
             example = DATA[0]
@@ -40,7 +45,7 @@ def get_entreprise_by_siren(siren):
 
     # Vérifier si le SIREN est bien chargé dans les données
     all_sirens = [clean_string(e.get('SIREN', '')) for e in DATA]
-    
+
     if siren not in all_sirens:
         print(f"❌ SIREN {siren} non trouvé dans la base !")
         return jsonify({"message": "Entreprise non trouvée"}), 404
