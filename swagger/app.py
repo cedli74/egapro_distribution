@@ -35,15 +35,8 @@ Swagger(app)
     }
 })
 def get_entreprise_by_siren(siren):
-    # Logique pour récupérer les données de l'entreprise
-    entreprise = {
-        "siren": siren,
-        "nom": "Entreprise Exemple",
-        "score_egalite": 95,
-        "adresse": "123 Rue Exemple, 75000 Paris",
-        "autres_infos": "..."
-    }
-    return jsonify(entreprise)
+    # Cette route est un proxy pour la documentation, pas besoin de logique ici
+    return jsonify({"message": "Données de l'entreprise"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)  # Assurez-vous que le port est 5000
+    app.run(host="0.0.0.0", port=5001)
