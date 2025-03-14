@@ -9,7 +9,7 @@ DATA = []
 
 def load_data():
     global DATA
-    csv_path = os.path.join(os.path.dirname(__file__), "../data/index-egalite-fh-utf8.csv")
+    csv_path = os.path.join(os.path.dirname(__file__), "/app/data/index-egalite-fh-utf8.csv")
     
     try:
         with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
