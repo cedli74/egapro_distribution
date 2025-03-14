@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flasgger import Swagger, swag_from
 
 app = Flask(__name__)
-Swagger(app)
+Swagger(app, template_file='swagger_template.yml')  # Utilisez le fichier de modèle
 
 @app.route("/api/v1/entreprises/<siren>", methods=["GET"])
 @swag_from({
@@ -35,8 +35,15 @@ Swagger(app)
     }
 })
 def get_entreprise_by_siren(siren):
-    # Cette route est un proxy pour la documentation, pas besoin de logique ici
-    return jsonify({"message": "Données de l'entreprise"})
+    # Logique pour récupérer les données de l'entreprise
+    entreprise = {
+        "siren": siren,
+        "nom": "Entreprise Exemple",
+        "score_egalite": 95,
+        "adresse": "123 Rue Exemple, 75000 Paris",
+        "autres_infos": "..."
+    }
+    return jsonify(entreprise)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5001)  # Swagger s'exécute sur le port 5001
