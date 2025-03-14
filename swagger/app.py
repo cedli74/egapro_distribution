@@ -1,4 +1,4 @@
-Tien mon code swagger from flask import Flask, jsonify
+from flask import Flask, jsonify
 from flasgger import Swagger, swag_from
 
 app = Flask(__name__)
