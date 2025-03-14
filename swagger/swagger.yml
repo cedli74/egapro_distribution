@@ -19,5 +19,12 @@ paths:
       responses:
         200:
           description: "Données de l'entreprise"
+          examples:
+            application/json:
+              siren: "123456789"
+              nom: "Entreprise Exemple"
+              score_egalite: 95
+              adresse: "123 Rue Exemple, 75000 Paris"
+              autres_infos: "..."
         404:
           description: "Entreprise non trouvée"
