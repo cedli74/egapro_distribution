@@ -3,6 +3,9 @@ info:
   title: "API EgaPro"
   description: "Documentation de l'API EgaPro"
   version: "1.0.0"
+host: "localhost:5000"  # Spécifiez le port 5000 ici pour les requêtes API
+schemes:
+  - "http"
 paths:
   /api/v1/entreprises:
     get:
