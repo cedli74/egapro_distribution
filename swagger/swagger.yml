@@ -7,9 +7,17 @@ host: "localhost:5000"  # Spécifiez le port 5000 ici pour les requêtes API
 schemes:
   - "http"
 paths:
-  /api/v1/entreprises:
+  /api/v1/entreprises/{siren}:
     get:
-      summary: "Obtenir la liste des entreprises"
+      summary: "Obtenir les données d'une entreprise par SIREN"
+      parameters:
+        - name: "siren"
+          in: "path"
+          required: true
+          type: "string"
+          description: "Numéro SIREN de l'entreprise"
       responses:
         200:
-          description: "Succès"
+          description: "Données de l'entreprise"
+        404:
+          description: "Entreprise non trouvée"
