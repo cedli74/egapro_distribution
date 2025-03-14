@@ -13,7 +13,7 @@ def load_data():
 
     try:
         with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
-            reader = csv.DictReader(csvfile)
+            reader = csv.DictReader(csvfile, delimiter=';')  # Spécifiez le séparateur
             DATA = [row for row in reader]
 
         if DATA:
