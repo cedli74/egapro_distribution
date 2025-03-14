@@ -39,4 +39,4 @@ def get_entreprise_by_siren(siren):
     return jsonify({"message": "Données de l'entreprise"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
