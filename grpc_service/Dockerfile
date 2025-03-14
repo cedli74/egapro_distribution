@@ -4,8 +4,11 @@ WORKDIR /app
 # Copier les fichiers Python
 COPY service.py requirements.txt /app/
 
-# Copier le dossier proto
-COPY grpc_service/proto /app/proto  # ✅ Correction du chemin
+# Vérification du dossier avant copie
+RUN ls -l grpc_service/
+
+# Correction : Copier le dossier proto
+COPY ./grpc_service/proto /app/proto
 
 RUN pip install -r requirements.txt
 
