@@ -8,14 +8,14 @@ class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
     def __init__(self):
         self.data = self.load_data()
 
-    def load_data(self):
-        data = []
-        csv_path = "/app/data/index-egalite-fh-utf8.csv"
-        with open(csv_path, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                data.append(row)
-        return data
+def load_data(self):
+    data = []
+    csv_path = "/app/data/index-egalite-fh-utf8.csv"
+    with open(csv_path, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')  # Ajout du delimiter
+        for row in reader:
+            data.append(row)
+    return data
 
     def GetEntreprises(self, request, context):
         entreprises = [egapro_pb2.Entreprise(**e) for e in self.data]
