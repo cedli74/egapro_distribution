@@ -13,7 +13,8 @@ COPY service.py client.py ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Génération des fichiers gRPC
-RUN python -m grpc_tools.protoc -Iproto --python_out=. --grpc_python_out=. proto/egapro.proto
+RUN python -m grpc_tools.protoc -Iproto --python_out=proto --grpc_python_out=proto proto/egapro.proto
+
 
 # Expose le port gRPC
 EXPOSE 50051
