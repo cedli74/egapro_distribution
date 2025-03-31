@@ -11,7 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Génération des fichiers gRPC dans le dossier proto
 RUN python -m grpc_tools.protoc -Iproto --python_out=proto --grpc_python_out=proto proto/egapro.proto
 
-# Ajoutez /app/proto au PYTHONPATH pour que les imports fonctionnent
 ENV PYTHONPATH=/app/proto:$PYTHONPATH
 
 EXPOSE 50051
