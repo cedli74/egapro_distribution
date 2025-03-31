@@ -21,3 +21,4 @@ docker-compose up --build
 - **gRPC:** `grpcurl -plaintext localhost:50051 list`
 - **Swagger:** `http://localhost/api/v1/apidocs`
 ```
+http://localhost:5001/apidocs/
