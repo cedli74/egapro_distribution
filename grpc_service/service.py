@@ -28,32 +28,36 @@ class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
     def __init__(self):
         self.data = load_csv()
 
-    def GetEntreprises(self, request, context):
-        entreprises = []
-        # Pour chaque ligne du CSV, on tente de créer un message Entreprise.
-        # On s'attend à ce que les clés du dictionnaire correspondent exactement aux noms de champs définis dans votre message proto.
-        for row in self.data:
-            try:
-                entreprises.append(egapro_pb2.Entreprise(**row))
-            except Exception as ex:
-                print(f"Erreur lors de la création d'une entreprise: {ex}")
-        return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
+   def GetEntreprises(self, request, context):
+    # Récupère les champs attendus définis dans le message Entreprise
+    allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
+    entreprises = []
+    for row in self.data:
+        # Crée un nouveau dictionnaire qui ne contient que les clés autorisées
+        filtered = {k: row[k] for k in row if k in allowed_fields}
+        try:
+            entreprises.append(egapro_pb2.Entreprise(**filtered))
+        except Exception as ex:
+            print(f"Erreur lors de la création d'une entreprise: {ex}")
+    return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
 
-    def GetEntrepriseBySiren(self, request, context):
-        siren_input = request.siren.strip()
-        # Recherche de l'entreprise dans le CSV en comparant le champ 'SIREN'
-        entreprise = next((row for row in self.data if row.get("SIREN", "").strip() == siren_input), None)
-        if entreprise:
-            try:
-                return egapro_pb2.EntrepriseResponse(entreprise=egapro_pb2.Entreprise(**entreprise))
-            except Exception as ex:
-                context.set_details(f"Erreur lors de la création de l'entreprise: {ex}")
-                context.set_code(grpc.StatusCode.INTERNAL)
-                return egapro_pb2.EntrepriseResponse()
-        else:
-            context.set_details("Entreprise non trouvée")
-            context.set_code(grpc.StatusCode.NOT_FOUND)
+def GetEntrepriseBySiren(self, request, context):
+    siren_input = request.siren.strip()
+    entreprise = next((row for row in self.data if row.get("SIREN", "").strip() == siren_input), None)
+    if entreprise:
+        allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
+        filtered = {k: entreprise[k] for k in entreprise if k in allowed_fields}
+        try:
+            return egapro_pb2.EntrepriseResponse(entreprise=egapro_pb2.Entreprise(**filtered))
+        except Exception as ex:
+            context.set_details(f"Erreur lors de la création de l'entreprise: {ex}")
+            context.set_code(grpc.StatusCode.INTERNAL)
             return egapro_pb2.EntrepriseResponse()
+    else:
+        context.set_details("Entreprise non trouvée")
+        context.set_code(grpc.StatusCode.NOT_FOUND)
+        return egapro_pb2.EntrepriseResponse()
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
