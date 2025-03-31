@@ -1,21 +1,27 @@
-import csv
-import os
+import grpc
+import proto.egapro_pb2 as egapro_pb2
+import proto.egapro_pb2_grpc as egapro_pb2_grpc
 
-def test_csv():
-    # Construit le chemin vers le fichier CSV
-    csv_path = os.path.join(os.path.dirname(__file__), "data/index-egalite-fh-utf8.csv")
-    try:
-        with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
-            # Spécifie le séparateur si votre CSV utilise des points-virgules
-            reader = csv.DictReader(csvfile, delimiter=';')
-            print("📄 Les trois premières lignes du CSV :")
-            for i, row in enumerate(reader):
-                if i < 3:
-                    print(f"Ligne {i+1} : {row}")
-                else:
-                    break
-    except Exception as e:
-        print(f"❌ Erreur lors de la lecture du CSV : {e}")
+def run():
+    with grpc.insecure_channel("localhost:50051") as channel:
+        stub = egapro_pb2_grpc.EgaproServiceStub(channel)
 
-if __name__ == '__main__':
-    test_csv()
+        # Demande à l'utilisateur d'entrer un SIREN
+        siren_input = input("Entrez le SIREN de l'entreprise recherchée : ").strip()
+        print(f"\n🔍 Recherche de l'entreprise avec SIREN {siren_input}...")
+        try:
+            response = stub.GetEntrepriseBySiren(egapro_pb2.EntrepriseRequest(siren=siren_input))
+            entreprise = response.entreprise
+            if entreprise and entreprise.siren:
+                print("✅ Entreprise trouvée:")
+                # Itère sur tous les champs définis dans le message et affiche leur nom et valeur
+                for field in entreprise.DESCRIPTOR.fields:
+                    value = getattr(entreprise, field.name)
+                    print(f"  {field.name}: {value}")
+            else:
+                print("❌ Entreprise non trouvée")
+        except grpc.RpcError as e:
+            print(f"❌ Erreur: {e.details()}")
+
+if __name__ == "__main__":
+    run()
