@@ -1,29 +1,21 @@
-import grpc
-import proto.egapro_pb2 as egapro_pb2
-import proto.egapro_pb2_grpc as egapro_pb2_grpc
+import csv
+import os
 
-def run():
-    with grpc.insecure_channel("localhost:50051") as channel:
-        stub = egapro_pb2_grpc.EgaproServiceStub(channel)
+def test_csv():
+    # Construit le chemin vers le fichier CSV
+    csv_path = os.path.join(os.path.dirname(__file__), "data/index-egalite-fh-utf8.csv")
+    try:
+        with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
+            # Spécifie le séparateur si votre CSV utilise des points-virgules
+            reader = csv.DictReader(csvfile, delimiter=';')
+            print("📄 Les trois premières lignes du CSV :")
+            for i, row in enumerate(reader):
+                if i < 3:
+                    print(f"Ligne {i+1} : {row}")
+                else:
+                    break
+    except Exception as e:
+        print(f"❌ Erreur lors de la lecture du CSV : {e}")
 
-        # Récupération et affichage de toutes les entreprises
-        print("🔍 Récupération de toutes les entreprises...")
-        response = stub.GetEntreprises(egapro_pb2.EntreprisesRequest())
-        for entreprise in response.entreprises:
-            print(f"{entreprise.siren} - {entreprise.raison_sociale} - Score: {entreprise.note_index}")
-
-        # Demande à l'utilisateur d'entrer un SIREN pour rechercher une entreprise spécifique
-        siren_input = input("\nEntrez le SIREN de l'entreprise recherchée : ").strip()
-        print(f"\n🔍 Recherche de l'entreprise avec SIREN {siren_input}...")
-        try:
-            response = stub.GetEntrepriseBySiren(egapro_pb2.EntrepriseRequest(siren=siren_input))
-            entreprise = response.entreprise
-            if entreprise.raison_sociale:
-                print(f"✅ Trouvé: {entreprise.raison_sociale} - Score: {entreprise.note_index} - Adresse: {entreprise.adresse}")
-            else:
-                print("❌ Erreur: Entreprise non trouvée")
-        except grpc.RpcError as e:
-            print(f"❌ Erreur: {e.details()}")
-
-if __name__ == "__main__":
-    run()
+if __name__ == '__main__':
+    test_csv()
