@@ -1,20 +1,22 @@
-# Utilise une image Python
-FROM python:3.9
+# Utilisation de Python 3.10
+FROM python:3.10
 
-# Définir le répertoire de travail
+# Définition du dossier de travail
 WORKDIR /app
 
-# Copier les fichiers nécessaires
-COPY service.py requirements.txt /app/
+# Copie des fichiers nécessaires
+COPY requirements.txt ./
+COPY proto /app/proto
+COPY service.py client.py ./
 
-# Copier le dossier proto
-COPY proto /app/proto/
-
-# Installer les dépendances
+# Installation des dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Générer les fichiers gRPC à partir du .proto
+# Génération des fichiers gRPC
 RUN python -m grpc_tools.protoc -Iproto --python_out=. --grpc_python_out=. proto/egapro.proto
 
-# Exécuter le serveur gRPC
+# Expose le port gRPC
+EXPOSE 50051
+
+# Commande pour démarrer le serveur gRPC
 CMD ["python", "service.py"]
