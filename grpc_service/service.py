@@ -38,9 +38,10 @@ def load_data(self):
     return data
 
 
-    def GetEntreprises(self, request, context):
-        entreprises = [egapro_pb2.Entreprise(**e) for e in self.data]
-        return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
+def GetEntreprises(self, request, context):
+    entreprises = [egapro_pb2.Entreprise(**e) for e in self.data]
+    return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
+
 
     def GetEntrepriseBySiren(self, request, context):
         siren = request.siren
