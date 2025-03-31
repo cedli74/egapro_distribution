@@ -6,32 +6,27 @@ import csv
 
 class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
     def __init__(self):
-        # On appelle load_data() ici, il doit exister dans la classe
         self.data = self.load_data()
 
     def load_data(self):
         data = []
         csv_path = "/app/data/index-egalite-fh-utf8.csv"
-        # Utilisation du délimiteur approprié, ici le point-virgule, si nécessaire
         with open(csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile, delimiter=';')
             for row in reader:
                 data.append(row)
         return data
 
-def GetEntreprises(self, request, context):
-    # Récupère la liste des noms de champs définis dans le message Entreprise
-    allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
+    def GetEntreprises(self, request, context):
+        # Ici, vous pouvez filtrer les champs si nécessaire
+        allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
+        entreprises = []
+        for e in self.data:
+            filtered = {k: v for k, v in e.items() if k in allowed_fields}
+            entreprises.append(egapro_pb2.Entreprise(**filtered))
+        return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
 
-    entreprises = []
-    for e in self.data:
-        # Filtre le dictionnaire : ne garder que les clés présentes dans allowed_fields
-        filtered = {k: v for k, v in e.items() if k in allowed_fields}
-        entreprises.append(egapro_pb2.Entreprise(**filtered))
-        
-    return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
-
-def GetEntrepriseBySiren(self, request, context):
+    def GetEntrepriseBySiren(self, request, context):
         siren = request.siren
         entreprise = next((e for e in self.data if e["SIREN"] == siren), None)
         if entreprise:
@@ -40,6 +35,7 @@ def GetEntrepriseBySiren(self, request, context):
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Entreprise non trouvée")
             return egapro_pb2.EntrepriseResponse()
+
             
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
