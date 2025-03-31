@@ -23,15 +23,18 @@ class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
         entreprises = [egapro_pb2.Entreprise(**e) for e in self.data]
         return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
 
-    def GetEntrepriseBySiren(self, request, context):
-        siren = request.siren
-        entreprise = next((e for e in self.data if e["SIREN"] == siren), None)
-        if entreprise:
-            return egapro_pb2.EntrepriseResponse(**entreprise)
-        else:
-            context.set_code(grpc.StatusCode.NOT_FOUND)
-            context.set_details("Entreprise non trouvée")
-            return egapro_pb2.EntrepriseResponse()
+def GetEntreprises(self, request, context):
+    # Récupère l'ensemble des noms de champs définis dans le message Entreprise
+    allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
+    
+    entreprises = []
+    for e in self.data:
+        # Filtrer le dictionnaire pour ne garder que les clés attendues
+        filtered = {k: v for k, v in e.items() if k in allowed_fields}
+        entreprises.append(egapro_pb2.Entreprise(**filtered))
+        
+    return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
