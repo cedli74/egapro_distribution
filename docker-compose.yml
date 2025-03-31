@@ -13,6 +13,8 @@ services:
       - "50051:50051"
     volumes:
       - ./data:/app/data
+      - ./grpc_service/data:/app/data
+      - ./grpc_service/proto:/app/proto
     restart: always
 
   swagger:
