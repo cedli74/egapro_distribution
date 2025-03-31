@@ -3,6 +3,7 @@ from concurrent import futures
 import proto.egapro_pb2 as egapro_pb2
 import proto.egapro_pb2_grpc as egapro_pb2_grpc
 import csv
+import os
 
 class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
     def __init__(self):
@@ -10,33 +11,51 @@ class EgaproService(egapro_pb2_grpc.EgaproServiceServicer):
 
     def load_data(self):
         data = []
-        csv_path = "/app/data/index-egalite-fh-utf8.csv"
-        with open(csv_path, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile, delimiter=';')
-            for row in reader:
-                data.append(row)
+        # Construire le chemin vers le fichier CSV en partant du dossier courant (/app)
+        csv_path = os.path.join(os.path.dirname(__file__), "data/index-egalite-fh-utf8.csv")
+        try:
+            with open(csv_path, newline='', encoding='utf-8-sig') as csvfile:
+                # Utiliser le point-virgule comme séparateur
+                reader = csv.DictReader(csvfile, delimiter=';')
+                data = [row for row in reader]
+            if data:
+                print(f"✅ {len(data)} entreprises chargées depuis le fichier CSV.")
+                print(f"🔍 Colonnes disponibles : {list(data[0].keys())}")
+                print("📄 Extrait des premières lignes du CSV :")
+                for i, example in enumerate(data[:3]):
+                    print(f"  Ligne {i+1} : {example}")
+            else:
+                print("❌ Aucun enregistrement chargé depuis le CSV.")
+        except Exception as e:
+            print(f"❌ Erreur lors du chargement des données : {e}")
         return data
 
     def GetEntreprises(self, request, context):
-        # Ici, vous pouvez filtrer les champs si nécessaire
+        # Récupérer les noms des champs définis dans le message Entreprise
         allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
         entreprises = []
-        for e in self.data:
-            filtered = {k: v for k, v in e.items() if k in allowed_fields}
-            entreprises.append(egapro_pb2.Entreprise(**filtered))
+        for row in self.data:
+            # Filtrer le dictionnaire pour ne garder que les champs attendus
+            filtered = {k: row[k] for k in row if k in allowed_fields}
+            try:
+                entreprises.append(egapro_pb2.Entreprise(**filtered))
+            except Exception as ex:
+                print(f"Erreur lors de la création d'une entreprise : {ex}")
         return egapro_pb2.EntreprisesResponse(entreprises=entreprises)
 
     def GetEntrepriseBySiren(self, request, context):
-        siren = request.siren
-        entreprise = next((e for e in self.data if e["SIREN"] == siren), None)
+        siren = request.siren.strip()
+        # Rechercher dans les données la ligne dont la colonne 'SIREN' correspond exactement au SIREN fourni
+        entreprise = next((row for row in self.data if row.get('SIREN', '').strip() == siren), None)
         if entreprise:
-            return egapro_pb2.EntrepriseResponse(**entreprise)
+            allowed_fields = set(egapro_pb2.Entreprise.DESCRIPTOR.fields_by_name.keys())
+            filtered = {k: entreprise[k] for k in entreprise if k in allowed_fields}
+            return egapro_pb2.EntrepriseResponse(entreprise=egapro_pb2.Entreprise(**filtered))
         else:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Entreprise non trouvée")
             return egapro_pb2.EntrepriseResponse()
 
-            
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     egapro_pb2_grpc.add_EgaproServiceServicer_to_server(EgaproService(), server)
