@@ -7,9 +7,7 @@ service EgaproService {
   rpc GetEntrepriseBySiren (EntrepriseRequest) returns (EntrepriseResponse);
 }
 
-message EntreprisesRequest {
-  // Ajoutez des champs si nécessaire
-}
+message EntreprisesRequest {}
 
 message EntreprisesResponse {
   repeated Entreprise entreprises = 1;
@@ -24,7 +22,6 @@ message EntrepriseResponse {
   string nom = 2;
   int32 score_egalite = 3;
   string adresse = 4;
-  // Ajoutez d'autres champs selon vos besoins
 }
 
 message Entreprise {
@@ -32,5 +29,4 @@ message Entreprise {
   string nom = 2;
   int32 score_egalite = 3;
   string adresse = 4;
-  // Ajoutez d'autres champs selon vos besoins
 }
