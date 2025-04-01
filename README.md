@@ -22,3 +22,5 @@ docker-compose up --build
 - **Swagger:** `http://localhost/api/v1/apidocs`
 ```
 http://localhost:5001/apidocs/
+
+docker-compose exec grpc_service python client.py
