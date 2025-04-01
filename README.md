@@ -1,131 +1,77 @@
 README – Lancement et Test du Projet EgaPro Distribution
-Ce projet propose une API REST (avec documentation Swagger) et un service gRPC pour interroger des données d’entreprises issues d’un fichier CSV. Nous utilisons Docker et Docker Compose pour faciliter le déploiement des différents services.
+Ce projet propose une API REST (avec documentation Swagger) et un service gRPC pour interroger des données d’entreprises issues d’un fichier CSV. Le projet utilise Docker et Docker Compose pour déployer les services.
 
-Prérequis
-Docker : Installer Docker
-
-Docker Compose : Installer Docker Compose
-
-Lancement du Projet avec Docker
+Lancement du Projet
 Cloner le dépôt :
+Cloner le dépôt depuis GitHub et se placer à la racine du projet.
 
-Ouvrez votre terminal et clonez le dépôt :
-
-bash
-Copier
-git clone https://github.com/votre-utilisateur/egapro_distribution.git
-cd egapro_distribution
 Vérifier le fichier docker-compose.yml :
+Le fichier compose définit quatre services :
 
-Le fichier docker-compose.yml se trouve à la racine du projet et définit plusieurs services :
+rest_api : Exposé sur le port 5000.
 
-rest_api : Le service de l'API REST, accessible sur le port 5000.
+grpc_service : Exposé sur le port 50051.
 
-grpc_service : Le service gRPC, accessible sur le port 50051.
+swagger : Exposé sur le port 5001.
 
-swagger : L'interface Swagger, accessible sur le port 5001.
+nginx : Configuré pour servir de reverse proxy sur le port 80 (configuration du reverse proxy en cours de finalisation).
 
-nginx : Un reverse proxy (en cours de configuration) accessible sur le port 80.
+Lancer l’ensemble des services :
+Depuis la racine du projet, exécuter la commande « docker-compose up --build ». Cette commande construit les images, monte les volumes (par exemple, le dossier data contenant le fichier CSV) et démarre tous les conteneurs.
 
-Exemple de configuration (extrait) :
+Tester l’API REST
+Pour tester l’API REST, accédez via votre navigateur ou un outil comme Postman à une URL de la forme :
 
-yaml
-Copier
-version: '3'
+  http://localhost:5000/api/v1/entreprises/{SIREN}
 
-services:
-  rest_api:
-    build: ./rest_api
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./data:/app/data
-    restart: always
+où {SIREN} est remplacé par le numéro de SIREN de l’entreprise. Par exemple, pour tester une entreprise avec le SIREN « 352383715 », utilisez :
 
-  grpc_service:
-    build: ./grpc_service
-    ports:
-      - "50051:50051"
-    volumes:
-      - ./data:/app/data
-    restart: always
+  http://localhost:5000/api/v1/entreprises/352383715
 
-  swagger:
-    build: ./swagger
-    ports:
-      - "5001:5001"
-    restart: always
+L’API renvoie les informations complètes de l’entreprise correspondante.
 
-  nginx:
-    build: ./nginx
-    ports:
-      - "80:80"
-    depends_on:
-      - rest_api
-      - grpc_service
-      - swagger
-    restart: always
-Lancer tous les services :
+Tester l’Interface Swagger
+L’interface Swagger permet de documenter et tester l’API REST.
+Pour y accéder, ouvrez votre navigateur à l’adresse :
 
-Dans la racine du projet, lancez la commande suivante pour construire les images et démarrer les conteneurs :
+  http://localhost:5001/apidocs/
 
-bash
-Copier
-docker-compose up --build
-Cette commande effectue les opérations suivantes :
-
-Build : Docker Compose construit les images pour chaque service en se basant sur les Dockerfiles présents dans les dossiers respectifs (rest_api, grpc_service, swagger, nginx).
-
-Montage des volumes : Par exemple, le dossier data (contenant votre fichier CSV) est monté dans les conteneurs rest_api et grpc_service.
-
-Démarrage des conteneurs : Une fois les images construites, les conteneurs sont démarrés et les ports sont mappés pour rendre les services accessibles depuis votre machine.
-
-Vous verrez dans le terminal les logs des différents services. Une fois les conteneurs démarrés, vous pouvez laisser ce terminal ouvert ou l'exécuter en mode détaché avec l'option -d.
-
-Tester l'API REST
-Pour tester l'API REST, ouvrez votre navigateur et accédez à une URL construite de la manière suivante :
-
-bash
-Copier
-http://localhost:5000/api/v1/entreprises/352383715
-Dans cet exemple, 352383715 représente le numéro de SIREN d'une entreprise. L'API REST renverra les informations associées à cette entreprise.
-
-Tester l'Interface Swagger
-L'interface Swagger est destinée à documenter et permettre de tester l'API REST. Elle est accessible directement via :
-
-bash
-Copier
-http://localhost:5001/apidocs/
-Vous pouvez l'utiliser pour envoyer des requêtes à l'API REST et voir la documentation de tous les endpoints.
+Cela vous permettra d’exécuter les endpoints et de voir la documentation.
 
 Tester le Service gRPC
-Pour tester le service gRPC, un client est inclus dans le projet. Pour lancer ce client :
+Un client gRPC interactif est inclus dans le projet.
+Pour le lancer, ouvrez un terminal et exécutez :
 
-Ouvrez un nouveau terminal.
+  docker-compose exec grpc_service python client.py
 
-Exécutez la commande suivante :
+Le client vous demandera d’entrer un numéro de SIREN. Après saisie, il affichera toutes les informations de l’entreprise correspondante, extraites du fichier CSV.
 
-bash
-Copier
-docker-compose exec grpc_service python client.py
-Le client vous demandera d'entrer un numéro de SIREN. Saisissez par exemple un SIREN existant (tel que présent dans votre CSV), et le client affichera toutes les informations de l'entreprise correspondante.
+Reverse Proxy Nginx
+Nous avons tenté de configurer un reverse proxy Nginx pour centraliser l’accès aux services sous le même domaine et port (80).
+L’objectif était de rediriger, par exemple, http://localhost/swagger/ vers http://localhost:5001/apidocs/ et ses ressources associées. Toutefois, la configuration n’a pas pu être finalisée dans son intégralité.
+Pour l’instant, l’interface Swagger reste accessible directement via http://localhost:5001/apidocs/ et le reverse proxy partiel (http://localhost/swagger/) est en cours d’amélioration.
 
-Reverse Proxy Nginx (En Cours de Finalisation)
-Nous avons entrepris de configurer un reverse proxy avec Nginx afin d'unifier l'accès aux services via le port 80. L'objectif est de rediriger par exemple :
+Lancement et Test – Résumé
+Lancement des services :
+Exécutez « docker-compose up --build » depuis la racine du projet.
 
-http://localhost/swagger/ vers http://localhost:5001/apidocs/ (avec redirection des ressources statiques).
+API REST :
+Testez via http://localhost:5000/api/v1/entreprises/{SIREN}
 
-Cependant, cette configuration n'est pas encore finalisée. Pour l'instant, l'interface Swagger est accessible directement via http://localhost:5001/apidocs/. Nous avons tenté de configurer Nginx pour rediriger http://localhost/swagger/, mais le développement n'est pas terminé. Vous pouvez continuer à tester Swagger via son URL directe.
+Interface Swagger :
+Testez via http://localhost:5001/apidocs/
 
-Conclusion
-Ce projet vous permet de tester :
+Service gRPC :
+Exécutez « docker-compose exec grpc_service python client.py » et suivez les instructions.
 
-Une API REST accessible via http://localhost:5000/api/v1/entreprises/{SIREN} (ajoutez le numéro de SIREN à la fin de l'URL),
+Pour toute question ou suggestion, n’hésitez pas à ouvrir une issue dans le dépôt GitHub.
 
-Une interface Swagger pour la documentation et les tests de l'API REST,
 
-Un service gRPC pour interroger les données d’entreprises via un client interactif.
 
-Pour l'instant, nous n'avons pas finalisé la configuration du reverse proxy Nginx pour Swagger, et il faut continuer à accéder à Swagger via http://localhost:5001/apidocs/.
+![image](https://github.com/user-attachments/assets/0ad930eb-f88e-40b3-a98d-ee0e2e771b28)
 
-N'hésitez pas à consulter les logs de Docker pour suivre le démarrage des conteneurs et poser vos questions via le système d'issues du dépôt si vous rencontrez des difficultés.
+![image](https://github.com/user-attachments/assets/603dbc09-6b7b-4c97-b51e-6780d5ebabb7)
+
+![image](https://github.com/user-attachments/assets/5c73a670-8146-4903-8935-df60da4d4643)
+
+![image](https://github.com/user-attachments/assets/7a53501f-0e81-4d0f-ba88-aaf9e7435eb1)
