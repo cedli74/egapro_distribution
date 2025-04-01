@@ -1,7 +1,7 @@
 FROM nginx:alpine
 
-# Supprimer la configuration par défaut
+# Supprimez la configuration par défaut
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copier votre configuration Nginx personnalisée dans le conteneur
+# Copiez votre configuration dans le dossier de configuration d'Nginx
 COPY default.conf /etc/nginx/conf.d/default.conf
