@@ -1,70 +1,88 @@
 Lancement et Test du Projet EgaPro Distribution
 Ce projet propose une API REST (avec documentation Swagger) et un service gRPC pour interroger des données d’entreprises issues d’un fichier CSV. Le projet utilise Docker et Docker Compose pour déployer les services.
 
-Lancement du Projet
+Lancement du Projet avec Docker
 Cloner le dépôt :
-Cloner le dépôt depuis GitHub et se placer à la racine du projet.
+Clonez le dépôt depuis GitHub et placez-vous à la racine du projet.
+
+Ajouter le fichier CSV complet :
+Vous devez placer le fichier CSV complet dans le dossier data situé à la racine du projet. Ce dossier doit contenir votre fichier, par exemple :
+data/index-egalite-fh-utf8.csv
+Assurez-vous que le fichier CSV est complet et correctement formaté pour que les services puissent le lire.
 
 Vérifier le fichier docker-compose.yml :
-Le fichier compose définit quatre services :
+Le fichier Compose définit quatre services :
 
-rest_api : Exposé sur le port 5000.
+rest_api : Accessible sur le port 5000.
 
-grpc_service : Exposé sur le port 50051.
+grpc_service : Accessible sur le port 50051.
 
-swagger : Exposé sur le port 5001.
+swagger : Accessible sur le port 5001.
 
-nginx : Configuré pour servir de reverse proxy sur le port 80 (configuration du reverse proxy en cours de finalisation).
+nginx : Configuré pour servir de reverse proxy sur le port 80 (la configuration Nginx pour Swagger n'est pas entièrement finalisée).
 
 Lancer l’ensemble des services :
-Depuis la racine du projet, exécuter la commande « docker-compose up --build ». Cette commande construit les images, monte les volumes (par exemple, le dossier data contenant le fichier CSV) et démarre tous les conteneurs.
+Depuis la racine du projet, exécutez :
+
+bash
+Copier
+docker-compose up --build
+Cette commande construit les images, monte les volumes (par exemple, le dossier data contenant le CSV) et démarre tous les conteneurs.
 
 Tester l’API REST
-Pour tester l’API REST, accédez via votre navigateur ou un outil comme Postman à une URL de la forme :
+Pour tester l’API REST, ouvrez votre navigateur ou utilisez un outil comme Postman et accédez à une URL de la forme :
 
-  http://localhost:5000/api/v1/entreprises/{SIREN}
+bash
+Copier
+http://localhost:5000/api/v1/entreprises/{SIREN}
+Par exemple, pour interroger l’entreprise dont le SIREN est 352383715, tapez :
 
-où {SIREN} est remplacé par le numéro de SIREN de l’entreprise. Par exemple, pour tester une entreprise avec le SIREN « 352383715 », utilisez :
-
-  http://localhost:5000/api/v1/entreprises/352383715
-
-L’API renvoie les informations complètes de l’entreprise correspondante.
+bash
+Copier
+http://localhost:5000/api/v1/entreprises/352383715
+L’API renverra toutes les informations de l’entreprise correspondante.
 
 Tester l’Interface Swagger
-L’interface Swagger permet de documenter et tester l’API REST.
-Pour y accéder, ouvrez votre navigateur à l’adresse :
+L’interface Swagger permet de documenter et de tester l’API REST. Elle est accessible via :
 
-  http://localhost:5001/apidocs/
-
-Cela vous permettra d’exécuter les endpoints et de voir la documentation.
+bash
+Copier
+http://localhost:5001/apidocs/
+Vous pouvez utiliser cette interface pour envoyer des requêtes aux endpoints de l’API REST et consulter la documentation.
 
 Tester le Service gRPC
-Un client gRPC interactif est inclus dans le projet.
+Pour tester le service gRPC, un client gRPC interactif est inclus dans le projet.
 Pour le lancer, ouvrez un terminal et exécutez :
 
-  docker-compose exec grpc_service python client.py
-
-Le client vous demandera d’entrer un numéro de SIREN. Après saisie, il affichera toutes les informations de l’entreprise correspondante, extraites du fichier CSV.
+bash
+Copier
+docker-compose exec grpc_service python client.py
+Le client vous demandera de saisir un numéro de SIREN et affichera ensuite toutes les informations de l’entreprise correspondante extraites du fichier CSV.
 
 Reverse Proxy Nginx
-Nous avons tenté de configurer un reverse proxy Nginx pour centraliser l’accès aux services sous le même domaine et port (80).
-L’objectif était de rediriger, par exemple, http://localhost/swagger/ vers http://localhost:5001/apidocs/ et ses ressources associées. Toutefois, la configuration n’a pas pu être finalisée dans son intégralité.
-Pour l’instant, l’interface Swagger reste accessible directement via http://localhost:5001/apidocs/ et le reverse proxy partiel (http://localhost/swagger/) est en cours d’amélioration.
+Nous avons tenté de configurer un reverse proxy Nginx pour centraliser l'accès aux services via le port 80. L’objectif était de rediriger par exemple :
 
-Lancement et Test – Résumé
-Lancement des services :
-Exécutez « docker-compose up --build » depuis la racine du projet.
+http://localhost/swagger/ vers http://localhost:5001/apidocs/ (et tous les chemins associés).
 
-API REST :
-Testez via http://localhost:5000/api/v1/entreprises/{SIREN}
+Cependant, la configuration Nginx pour cette redirection n'est pas entièrement finalisée. Pour l'instant, l’interface Swagger reste accessible directement via http://localhost:5001/apidocs/.
 
-Interface Swagger :
-Testez via http://localhost:5001/apidocs/
+Conclusion
+Ce projet vous permet de :
 
-Service gRPC :
-Exécutez « docker-compose exec grpc_service python client.py » et suivez les instructions.
+Tester l’API REST en accédant à l’URL :
+http://localhost:5000/api/v1/entreprises/{SIREN}
+(remplacez {SIREN} par le numéro de SIREN de l’entreprise désirée)
 
-Pour toute question ou suggestion, n’hésitez pas à ouvrir une issue dans le dépôt GitHub.
+Consulter l’interface Swagger via http://localhost:5001/apidocs/.
+
+Interroger le service gRPC avec le client inclus en lançant :
+
+bash
+Copier
+docker-compose exec grpc_service python client.py
+Important : Assurez-vous que le fichier CSV complet se trouve dans le dossier data à la racine du projet, car il est indispensable pour charger les données d'entreprises.
+
+Pour toute question ou amélioration, n’hésitez pas à ouvrir une issue dans le dépôt.
 
 
 
