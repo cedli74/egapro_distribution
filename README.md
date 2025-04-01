@@ -1,4 +1,4 @@
-README – Lancement et Test du Projet EgaPro Distribution
+Lancement et Test du Projet EgaPro Distribution
 Ce projet propose une API REST (avec documentation Swagger) et un service gRPC pour interroger des données d’entreprises issues d’un fichier CSV. Le projet utilise Docker et Docker Compose pour déployer les services.
 
 Lancement du Projet
@@ -73,5 +73,8 @@ Pour toute question ou suggestion, n’hésitez pas à ouvrir une issue dans le 
 ![image](https://github.com/user-attachments/assets/603dbc09-6b7b-4c97-b51e-6780d5ebabb7)
 
 ![image](https://github.com/user-attachments/assets/5c73a670-8146-4903-8935-df60da4d4643)
+
+![image](https://github.com/user-attachments/assets/22afb652-2e46-41ba-94d0-876583e94ea1)
+
 
 ![image](https://github.com/user-attachments/assets/7a53501f-0e81-4d0f-ba88-aaf9e7435eb1)
